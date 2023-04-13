@@ -384,6 +384,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) seedReplica(
 					Volumes:            volumes,
 					ImagePullSecrets:   h.directory.Spec.Pods.Image.ImagePullSecrets,
 					ServiceAccountName: h.directory.Spec.Pods.ServiceAccountName,
+					SecurityContext:    h.directory.Spec.Pods.SecurityContext,
 					RestartPolicy:      corev1.RestartPolicyNever,
 					Containers:         []corev1.Container{{
 						Env:             env,
@@ -633,6 +634,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 			Volumes:            volumes,
 			ImagePullSecrets:   h.directory.Spec.Pods.Image.ImagePullSecrets,
 			ServiceAccountName: h.directory.Spec.Pods.ServiceAccountName,
+			SecurityContext:    h.directory.Spec.Pods.SecurityContext,
 			Hostname:           podName,
 			Containers:         []corev1.Container{{
 				Env:             env,

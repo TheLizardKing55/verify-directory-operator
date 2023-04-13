@@ -657,6 +657,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createProxyDeployment(
 					Volumes:            volumes,
 					ImagePullSecrets:   h.directory.Spec.Pods.Image.ImagePullSecrets,
 					ServiceAccountName: h.directory.Spec.Pods.ServiceAccountName,
+					SecurityContext:    h.directory.Spec.Pods.SecurityContext,
 					Hostname:           name,
 					Containers:         []corev1.Container{{
 						Env:             env,
