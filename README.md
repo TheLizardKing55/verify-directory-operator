@@ -304,7 +304,7 @@ The `IBMSecurityVerifyDirectory` custom resource definition contains the followi
 |spec.pods.envFrom[]|A list of sources to populate environment variables in the container.  Further information can be found at [https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/]().| |No
 |spec.pods.env[]|A list of environment variables to be added to the pods.  Further information can be found at [https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/]().| |No
 |spec.pods.serviceAccountName|The Kubernetes account which the pods will run as.|default|No
-|spec.pods.securityContext|The security context which will be used by the running pods.  Further information can be found at [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/]().  The `runAsUser` field should only ever be set to `1000`.| |No
+|spec.pods.securityContext|The security context which will be used by the running pods.  Further information can be found at [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/]().  Note that the `runAsUser` field will always be set to `1000`.  In an OpenShift environment it is critical that the service account which the pod is set to run as has the security context restraints set so that the `1000` UID is permitted. | |No
 
 Please note that if a modification of the LDAP schema is required, using LDAP modification operations, a PVC will also need to be specified for the proxy.  In addition to this, the number of proxy replicas should be scaled back to 1 while the LDAP schema modifications take place.  The number of proxy replicas can then be scaled back up again after the LDAP schema modifications have been completed.
 
@@ -346,16 +346,4 @@ kubectl get ibmsecurityverifydirectory.ibm.com/ibmsecurityverifydirectory-sample
 ```
 
 To help debug any failures the log of the operator controller can also be examined.    The operator controller will be named something like, `verify-directory-operator-controller-manager-5856c8664c-wnnpm`, and will be in the namespace into which the operator was installed.
-
-### Security Context
-
-The IBM Security Verify Directory images have been designed to run as the `1000` user.  This has been set as the default user within the image definition, but in certain Kubernetes environments this setting does not always take effect.  If the verify-directory-server pod fails to start, and you see an error like the following in the log of the pod, you should manually set the `spec.pods.securityContext.runAsUser` field to `1000`. 
-
-```
-GLPBOO002I Bootstrapping the container.
-GLPCON011I Performing the configuration of the server.
-GLPBOO001I Initializing the environment from the template.
-tar: can't remove old file home/idsldap/.bash_logout: Permission denied
-GLPUTI001E Failed to execute the command: tar (1). (SVDExec.cpp:85)
-```
 
