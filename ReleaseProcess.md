@@ -33,10 +33,11 @@ At a high level you need to (taken from: [https://k8s-operatorhub.github.io/comm
 1. Test the operator locally.
 2. Fork the [GitHub project](https://github.com/k8s-operatorhub/community-operators).
 3. Add the operator bundle to the ibm-application-gateway-operator directory.
-4. Push a 'signed' commit of the changes.  See [https://k8s-operatorhub.github.io/community-operators/contributing-prerequisites/](https://k8s-operatorhub.github.io/community-operators/contributing-prerequisites/).  The easiest way to sign the commit is to use the `git commit -s -m '<description>'` command to commit the changes.
-5. Contribute the changes back to the main GitHub repository (using the 'Contribute' button in the GitHub console).  This will have the effect of creating a new pull request against the main GitHub repository.
-6. Monitor the 'checks' against the pull request to ensure that all of the automated test cases pass.
-7. Wait for the pull request to be merged.  This will usually happen overnight.
+4. Add the 'replaces' field to the `ibm-security-verify-directory-operator.clusterserviceversion.yaml` file to indicate which version of the operator is being replaced.
+5. Push a 'signed' commit of the changes.  See [https://k8s-operatorhub.github.io/community-operators/contributing-prerequisites/](https://k8s-operatorhub.github.io/community-operators/contributing-prerequisites/).  The easiest way to sign the commit is to use the `git commit -s -m '<description>'` command to commit the changes.
+6. Contribute the changes back to the main GitHub repository (using the 'Contribute' button in the GitHub console).  This will have the effect of creating a new pull request against the main GitHub repository.
+7. Monitor the 'checks' against the pull request to ensure that all of the automated test cases pass.
+8. Wait for the pull request to be merged.  This will usually happen overnight.
 
 # RedHat Operator Certification
 
