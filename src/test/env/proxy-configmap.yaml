@@ -8,11 +8,14 @@ apiVersion: v1
 kind: ConfigMap 
 metadata: 
   name: isvd-proxy-config
-  namespace: default 
 data: 
   config.yaml: | 
     general: 
       id: isvd-proxy
+
+      ports:
+        ldap: 9389
+        ldaps: 9636
 
       json-logging: false
 

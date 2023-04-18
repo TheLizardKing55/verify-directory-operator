@@ -629,12 +629,6 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createProxyDeployment(
 	}
 
 	/*
-	 * We always need to run as the '1000' user.
-	 */
-
-	h.directory.Spec.Pods.SecurityContext.RunAsUser = &utils.RunAsUser
-
-	/*
 	 * Finalise the deployment definition.
 	 */
 
@@ -663,7 +657,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createProxyDeployment(
 					Volumes:            volumes,
 					ImagePullSecrets:   h.directory.Spec.Pods.Image.ImagePullSecrets,
 					ServiceAccountName: h.directory.Spec.Pods.ServiceAccountName,
-					SecurityContext:    &h.directory.Spec.Pods.SecurityContext,
+					SecurityContext:    h.directory.Spec.Pods.SecurityContext,
 					Hostname:           name,
 					Containers:         []corev1.Container{{
 						Env:             env,

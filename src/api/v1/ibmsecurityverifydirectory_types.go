@@ -138,7 +138,7 @@ type IBMSecurityVerifyDirectoryPods struct {
     // with.  
     // More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
     // +optional
-    SecurityContext corev1.PodSecurityContext `json:"securityContext,omitempty" protobuf:"bytes,15,opt,name=securityContext"`
+    SecurityContext *corev1.PodSecurityContext `json:"securityContext,omitempty" protobuf:"bytes,15,opt,name=securityContext"`
 }
 
 // IBMSecurityVerifyDirectorySpec defines the desired state of 

@@ -24,7 +24,6 @@ import (
 
 const PVCLabel        = "app.kubernetes.io/pvc-name"
 var   ProxyCMKey      = "config.yaml"
-var   RunAsUser int64 = 1000
 
 /*****************************************************************************/
 
