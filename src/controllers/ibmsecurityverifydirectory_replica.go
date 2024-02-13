@@ -53,12 +53,15 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplicaController(
 	var err error = nil
 
 	r.Log.V(1).Info("Entering a function", 
-				r.createLogParams(h, "Function", "createReplicas")...)
+				r.createLogParams(h, "Function", "deployReplicaController")...)
 
 	/*
 	 * Don't do anything here if there is nothing to be added.
 	 */
 
-
+	if len(toBeAdded) == 0 {
+		return existing, nil
+	}
+	
 
   
