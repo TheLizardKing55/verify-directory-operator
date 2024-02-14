@@ -62,6 +62,17 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplicaController(
 	if len(toBeAdded) == 0 {
 		return existing, nil
 	}
-	
 
+	} else {
+
+		/*
+	         * We now want to create/restart the replica controller.
+	         */
   
+		var pod string
+
+		err = r.createReplicaController(h, port, updated)
+
+			if err != nil {
+			return nil, err
+		}
