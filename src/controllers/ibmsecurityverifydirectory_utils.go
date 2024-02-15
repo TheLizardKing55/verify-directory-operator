@@ -23,12 +23,15 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"context"
+	"log"
 
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1  "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/remotecommand"
@@ -51,6 +54,55 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaPodName(
 			directory  *ibmv1.IBMSecurityVerifyDirectory,
 			pvcName    string) (string) {
 	return strings.ToLower(fmt.Sprintf("%s-%s", directory.Name, pvcName))
+}
+
+/*****************************************************************************/
+
+/*
+ * The following function is used to get the replica controller pod name.
+ */
+
+func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
+			h		*RequestHandle,
+			replicaName	string) (string) {
+
+	r.Log.V(1).Info("Entering a function", 
+			r.createLogParams(h, "Function", "getReplicaSetPodName",
+				"Replica.Name", replicaName)...)
+	
+	// Create a Kubernetes client
+        config, err := kubernetes.NewInClusterConfig()
+        if err != nil {
+   	    r.Log.Error(err, "Failed to create Kubernetes client")...)
+						r.createLogParams(h, "Replica.Name", replicaName)...)
+        }
+        clientset, err := kubernetes.NewForConfig(config)
+        if err != nil {
+   	    r.Log.Error(err, "Failed to get the clientset")...)
+						r.createLogParams(h, "Replica.Name", replicaName)...)
+        }
+
+    	// Get the replicaset
+    	replicaset, err := clientset.AppsV1().ReplicaSets().Get(context.TODO(), replicaName, v1.GetOptions{})
+    	if err != nil {
+   	    r.Log.Error(err, "Failed to get the replicaset")...)
+						r.createLogParams(h, "Replica.Name", replicaName)...)
+    	}
+
+        // Wait for the replica set to be available.
+        /*err = wait.PollImmediate(time.Second, 3*time.Minute, func() (bool, error) {
+        // Check if the replica set is available.
+        if replicaSet.Status.ReadyReplicas == replicaSet.Status.Replicas {
+            return true, nil
+        }
+
+        // The replica set is not available yet.
+        return false, nil
+    	})
+	if err != nil {
+            panic(err)
+    	}*/
+	return replicaset.Spec.Template.Spec.Containers[0].Name
 }
 
 /*****************************************************************************/
