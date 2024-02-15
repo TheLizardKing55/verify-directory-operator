@@ -14,16 +14,25 @@ package controllers
 /*****************************************************************************/
 
 import (
-	metav1  "k8s.io/apimachinery/pkg/apis/meta/v1"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1  "k8s.io/api/core/v1"
 	batchv1 "k8s.io/api/batch/v1"
+	metav1  "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/ibm-security/verify-directory-operator/utils"
 
 	ctrl "sigs.k8s.io/controller-runtime"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 /*****************************************************************************/
@@ -624,55 +633,116 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 		},
 	}
 
-	pod := &corev1.Pod{
+	/*
+	 * Set the labels for the pod.
+	 */
+
+	labels := map[string]string{
+		"app.kubernetes.io/kind":    "IBMSecurityVerifyDirectory",
+		"app.kubernetes.io/cr-name": podName,
+	}
+
+	/*
+	 * Finalise the deployment definition.
+	 */
+
+	var replicas int32 = 1
+	
+	rep := &appsv1.ReplicaSet
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
-			Namespace: h.directory.Namespace,
+			Namespace: h.directory.Namespac
 			Labels:    utils.LabelsForApp(h.directory.Name, pvcName),
-		},
-		Spec: corev1.PodSpec{
-			Volumes:            volumes,
-			ImagePullSecrets:   h.directory.Spec.Pods.Image.ImagePullSecrets,
-			ServiceAccountName: h.directory.Spec.Pods.ServiceAccountName,
-			SecurityContext:    h.directory.Spec.Pods.SecurityContext,
-			Hostname:           podName,
-			Containers:         []corev1.Container{{
-				Env:             env,
-				EnvFrom:         h.directory.Spec.Pods.EnvFrom,
-				Image:           imageName,
-				ImagePullPolicy: h.directory.Spec.Pods.Image.ImagePullPolicy,
-				LivenessProbe:   livenessProbe,
-				Name:            podName,
-				Ports:           ports,
-				ReadinessProbe:  readinessProbe,
-				Resources:       h.directory.Spec.Pods.Resources,
-				VolumeMounts:    volumeMounts,
-			}},
+		};
+		Spec: appsv1.ReplicaSetSpec{
+			Replicas: &replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: labels,
+			},
+	                Template: &corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      podName,
+					Labels:    labels,
+				},
+				Spec: corev1.PodSpec{
+					Volumes:            volumes,
+					ImagePullSecrets:   h.directory.Spec.Pods.Image.ImagePullSecrets,
+					ServiceAccountName: h.directory.Spec.Pods.ServiceAccountName,
+					SecurityContext:    h.directory.Spec.Pods.SecurityContext,
+					Hostname:           podName,
+					Containers:         []corev1.Container{{
+						Env:             env,
+						EnvFrom:         h.directory.Spec.Pods.EnvFrom,
+						Image:           imageName,
+						ImagePullPolicy: h.directory.Spec.Pods.Image.ImagePullPolicy,
+						LivenessProbe:   livenessProbe,
+						Name:            podName,
+						Ports:           ports,
+						ReadinessProbe:  readinessProbe,
+						Resources:       h.directory.Spec.Pods.Resources,
+						VolumeMounts:    volumeMounts,
+					}},
+				},
+			},
 		},
 	}
 
-	ctrl.SetControllerReference(h.directory, pod, r.Scheme)
+	ctrl.SetControllerReference(h.directory, rep, r.Scheme)
 
 	/*
 	 * Create the pod.
 	 */
 
 	r.Log.Info("Creating a new pod", 
-						r.createLogParams(h, "Pod.Name", pod.Name)...)
+						r.createLogParams(h, "ReplicaSet.Name", rep.Name)...)
 
-	r.Log.V(1).Info("Pod details", 
-				r.createLogParams(h, "Details", pod)...)
+	r.Log.V(1).Info("Replica details", 
+				r.createLogParams(h, "Details", rep)...)
 
-	err := r.Create(h.ctx, pod)
+	err := r.Create(h.ctx, rep)
 
 	if err != nil {
  		r.Log.Error(err, "Failed to create the new pod",
-						r.createLogParams(h, "Pod.Name", pod.Name)...)
+						r.createLogParams(h, "ReplicaSet.Name", rep.Name)...)
 
 		return "", err
 	}
 
-	return podName, nil
+        // Create a Kubernetes client
+        config, err := kubernetes.NewInClusterConfig()
+        if err != nil {
+            log.Fatal(err)
+        }
+        clientset, err := kubernetes.NewForConfig(config)
+        if err != nil {
+            log.Fatal(err)
+        }
+
+    	// Get the replicaset
+    	replicaset, err := clientset.AppsV1().ReplicaSets().Get(context.TODO(), rep.Name, v1.GetOptions{})
+    	if err != nil {
+            log.Fatal(err)
+    	}
+
+        // Wait for the replica set to be available.
+        /*err = wait.PollImmediate(time.Second, 3*time.Minute, func() (bool, error) {
+        // Check if the replica set is available.
+        if replicaSet.Status.ReadyReplicas == replicaSet.Status.Replicas {
+            return true, nil
+        }
+
+        // The replica set is not available yet.
+        return false, nil
+    	})
+	if err != nil {
+            panic(err)
+    	}*/
+
+    	// Get the pod name
+	var name string
+    	name := replicaset.Spec.Template.Spec.Containers[0].Name
+
+	return name, nil
 }
 
 /*****************************************************************************/
