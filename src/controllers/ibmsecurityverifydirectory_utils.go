@@ -102,6 +102,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
 	if err != nil {
             panic(err)
     	}*/
+	
 	return replicaset.Spec.Template.Spec.Containers[0].Name
 }
 
