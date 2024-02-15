@@ -478,11 +478,15 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicationAgreement(
 		"Creating the replication agreement for the new replica", 
 		r.createLogParams(h, "source", sourcePvc, "destination", destPvc)...)
 
-	principalPod  := r.getReplicaPodName(h.directory, principalPvc)
-	srcPod        := r.getReplicaPodName(h.directory, sourcePvc)
-	dstPod        := r.getReplicaPodName(h.directory, destPvc)
+	principalRep  := r.getReplicaPodName(h.directory, principalPvc)
+	srcRep        := r.getReplicaPodName(h.directory, sourcePvc)
+	dstRep        := r.getReplicaPodName(h.directory, destPvc)
 	command       := []string{"isvd_manage_replica"}
 	portStr       := strconv.Itoa(int(h.config.port))
+
+	principalPod := getReplicaSetPodName(h, principalRep)
+	srcPod := getReplicaSetPodName(h, srcRep)
+	dstPod := getReplicaSetPodName(h, dstRep)
 
 	/*
 	 * Let's play it safe and delete any pre-existing replication agreements
@@ -708,39 +712,10 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 		return "", err
 	}
 
-        // Create a Kubernetes client
-        config, err := kubernetes.NewInClusterConfig()
-        if err != nil {
-            log.Fatal(err)
-        }
-        clientset, err := kubernetes.NewForConfig(config)
-        if err != nil {
-            log.Fatal(err)
-        }
-
-    	// Get the replicaset
-    	replicaset, err := clientset.AppsV1().ReplicaSets().Get(context.TODO(), rep.Name, v1.GetOptions{})
-    	if err != nil {
-            log.Fatal(err)
-    	}
-
-        // Wait for the replica set to be available.
-        /*err = wait.PollImmediate(time.Second, 3*time.Minute, func() (bool, error) {
-        // Check if the replica set is available.
-        if replicaSet.Status.ReadyReplicas == replicaSet.Status.Replicas {
-            return true, nil
-        }
-
-        // The replica set is not available yet.
-        return false, nil
-    	})
-	if err != nil {
-            panic(err)
-    	}*/
-
-    	// Get the pod name
+        // Get the pod name
 	var name string
-    	name := replicaset.Spec.Template.Spec.Containers[0].Name
+        
+    	name := getReplicaSetPodName(h, podName)
 
 	return name, nil
 }
