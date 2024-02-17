@@ -67,10 +67,11 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplicas(
 		 */
 
 		id := r.getReplicaPodName(h.directory, pvcName)
+		name := r.getReplicaSetPodName(h, id)
 		
 		for pvc, podName := range existing {
 			if _, ok := toBeDeletedPvcs[pvc]; !ok {
-				r.deleteReplicationAgreement(h, podName, id)
+				r.deleteReplicationAgreement(h, name, id)
 			}
 		}
 
