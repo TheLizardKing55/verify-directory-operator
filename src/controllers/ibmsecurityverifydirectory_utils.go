@@ -400,7 +400,18 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 	r.Log.V(1).Info("Entering a function", 
 				r.createLogParams(h, "Function", "createClusterService",
 						"Pod.Name", podName, "Port", serverPort,
-						"PVC.Name", pvcName)...)	
+						"PVC.Name", pvcName)...)
+
+	podName  := r.getReplicaPodName(h.directory, pvcName)
+
+	/*
+	 * Set the labels for the pod.
+	 */
+
+	labels := map[string]string{
+		"app.kubernetes.io/kind":    "IBMSecurityVerifyDirectory",
+		"app.kubernetes.io/cr-name": podName,
+	}
 
 	/*
 	 * Initialise the service structure.
@@ -410,11 +421,11 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
 			Namespace: h.directory.Namespace,
-			Labels:    utils.LabelsForApp(h.directory.Name, pvcName),
+			Labels:    labels,
 		},
 		Spec: corev1.ServiceSpec{
 			Type:     corev1.ServiceTypeClusterIP,
-			Selector: utils.LabelsForApp(h.directory.Name, pvcName),
+			Selector: labels,
 			Ports:    []corev1.ServicePort{{
 				Name:       podName,
 				Protocol:   corev1.ProtocolTCP,
