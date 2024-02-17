@@ -103,7 +103,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 						"PVC.Name", pvcName)...)	
 
 	podName := r.getReplicaPodName(h.directory, pvcName)
-	name := getReplicaSetPodName(h, podName)
+	name := r.getReplicaSetPodName(h, podName)
 
 	/*
 	 * Set the labels for the pod.
