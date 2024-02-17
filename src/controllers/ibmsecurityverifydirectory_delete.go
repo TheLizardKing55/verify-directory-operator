@@ -103,6 +103,15 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 						"PVC.Name", pvcName)...)	
 
 	podName := r.getReplicaPodName(h.directory, pvcName)
+	name := getReplicaSetPodName(h, podName)
+
+	/*
+	 * Set the labels for the pod.
+	 */
+
+	labels := map[string]string{
+		"app.kubernetes.io/kind":    "IBMSecurityVerifyDirectory",
+		"app.kubernetes.io/cr-name": podName,
 
 	/*
 	 * Delete the service.
@@ -112,7 +121,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
 			Namespace: h.directory.Namespace,
-			Labels:    utils.LabelsForApp(h.directory.Name, pvcName),
+			Labels:    labels,
 		},
 	}
 
@@ -128,7 +137,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 	 * Delete the pod.
 	 */
 
-	pod := &corev1.Pod{
+	rep := &appsv1.ReplicaSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
 			Namespace: h.directory.Namespace,
@@ -136,9 +145,9 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 		},
 	}
 
-	r.Log.V(1).Info("Deleting a pod.", "Pod", pod)
+	r.Log.V(1).Info("Deleting a pod.", "ReplicaSet.Name", podName)
 
-	err = r.Delete(h.ctx, pod)
+	err = r.Delete(h.ctx, ReplicaSet)
 
 	if err != nil && !errors.IsNotFound(err) {
 		return 
@@ -146,18 +155,18 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 
 	/*
 	 * Wait for the pod to stop.
-	 */
+	 */	
 
 	r.Log.Info("Waiting for the pod to stop", 
-					r.createLogParams(h, "Pod.Name", podName)...)
+					r.createLogParams(h, "Pod.Name", name)...)
 
 	err = wait.PollImmediate(time.Second, time.Duration(300) * time.Second, 
-					r.isPodOpComplete(h, podName, false))
+					r.isPodOpComplete(h, name, false))
 
 	if err != nil {
 		r.Log.Error(err, 
 			"The pod failed to stop within the allocated time.",
-			r.createLogParams(h, "Pod.Name", podName)...)
+			r.createLogParams(h, "Pod.Name", name)...)
 
 		return
 	}
