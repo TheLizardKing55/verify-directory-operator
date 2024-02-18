@@ -14,6 +14,7 @@ package controllers
 /*****************************************************************************/
 
 import (
+	appsv1  "k8s.io/api/apps/v1"
 	corev1  "k8s.io/api/core/v1"
 	metav1  "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -69,7 +70,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplicas(
 		id := r.getReplicaPodName(h.directory, pvcName)
 		name := r.getReplicaSetPodName(h, id)
 		
-		for pvc, podName := range existing {
+		for pvc, _ := range existing {
 			if _, ok := toBeDeletedPvcs[pvc]; !ok {
 				r.deleteReplicationAgreement(h, name, id)
 			}
@@ -149,7 +150,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 
 	r.Log.V(1).Info("Deleting a pod.", "ReplicaSet.Name", podName)
 
-	err = r.Delete(h.ctx, ReplicaSet)
+	err = r.Delete(h.ctx, rep)
 
 	if err != nil && !errors.IsNotFound(err) {
 		return 
