@@ -715,7 +715,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
         // Get the pod name
 	var name string
         
-    	name = getReplicaSetPodName(h, podName)
+    	name = r.getReplicaSetPodName(h, podName)
 
 	return name, nil
 }
