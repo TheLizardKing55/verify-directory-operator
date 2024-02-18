@@ -21,18 +21,10 @@ import (
 
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/ibm-security/verify-directory-operator/utils"
 
 	ctrl "sigs.k8s.io/controller-runtime"
-
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 /*****************************************************************************/
