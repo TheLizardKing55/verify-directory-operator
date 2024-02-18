@@ -113,7 +113,8 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 	labels := map[string]string{
 		"app.kubernetes.io/kind":    "IBMSecurityVerifyDirectory",
 		"app.kubernetes.io/cr-name": podName,
-
+	}
+		
 	/*
 	 * Delete the service.
 	 */
