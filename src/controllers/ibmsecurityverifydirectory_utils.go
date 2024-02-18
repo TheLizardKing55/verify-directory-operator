@@ -73,19 +73,19 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
 	// Create a Kubernetes client
         config, err := kubernetes.NewInClusterConfig()
         if err != nil {
-   	    r.Log.Error(err, "Failed to create Kubernetes client")...)
+   	    r.Log.Error(err, "Failed to create Kubernetes client",
 						r.createLogParams(h, "Replica.Name", replicaName)...)
         }
         clientset, err := kubernetes.NewForConfig(config)
         if err != nil {
-   	    r.Log.Error(err, "Failed to get the clientset")...)
+   	    r.Log.Error(err, "Failed to get the clientset",
 						r.createLogParams(h, "Replica.Name", replicaName)...)
         }
 
     	// Get the replicaset
     	replicaset, err := clientset.AppsV1().ReplicaSets().Get(context.TODO(), replicaName, v1.GetOptions{})
     	if err != nil {
-   	    r.Log.Error(err, "Failed to get the replicaset")...)
+   	    r.Log.Error(err, "Failed to get the replicaset",
 						r.createLogParams(h, "Replica.Name", replicaName)...)
     	}
 
