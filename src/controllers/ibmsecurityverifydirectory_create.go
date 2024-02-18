@@ -652,7 +652,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 
 	var replicas int32 = 1
 	
-	rep := &appsv1.ReplicaSet
+	rep := &appsv1.ReplicaSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
 			Namespace: h.directory.Namespace,
