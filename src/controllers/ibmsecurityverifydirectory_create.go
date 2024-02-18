@@ -655,7 +655,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	rep := &appsv1.ReplicaSet
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
-			Namespace: h.directory.Namespac
+			Namespace: h.directory.Namespace,
 			Labels:    utils.LabelsForApp(h.directory.Name, pvcName),
 		};
 		Spec: appsv1.ReplicaSetSpec{
