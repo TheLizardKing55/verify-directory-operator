@@ -663,7 +663,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
-	                Template: &corev1.PodTemplateSpec{
+	                Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      podName,
 					Labels:    labels,
@@ -715,7 +715,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
         // Get the pod name
 	var name string
         
-    	name := getReplicaSetPodName(h, podName)
+    	name = getReplicaSetPodName(h, podName)
 
 	return name, nil
 }
