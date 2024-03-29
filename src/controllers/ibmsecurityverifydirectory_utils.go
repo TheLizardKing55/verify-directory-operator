@@ -58,6 +58,43 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaPodName(
 /*****************************************************************************/
 
 /*
+ * The following function is used to wait for the specified replica set to start
+ * and be ready.
+ */
+
+func (r *IBMSecurityVerifyDirectoryReconciler) waitForReplicaset(
+				h    *RequestHandle,
+				name string) (err error) {
+
+	r.Log.Info("Waiting up to 3 minutes for the pod to become ready", 
+					r.createLogParams(h, "Pod.Name", name)...)
+
+	err = wait.PollImmediate(time.Second, time.Duration(180) * time.Second, func() (bool, error) {
+        // Check if the replica set is available.
+        if replicaSet.Status.ReadyReplicas == replicaSet.Status.Replicas {
+            return true, nil
+        }
+
+        // The replica set is not available yet.
+        return false, nil
+    	})
+
+	if err != nil {
+ 		r.Log.Error(err, 
+				"The pod failed to become ready within the allocated time.",
+				r.createLogParams(h, "Pod.Name", name)...)
+
+		err = errors.New(fmt.Sprintf("The pod, %s, failed to become ready " +
+				"within the allocated time.", name))
+
+		return 
+	}
+
+	return
+}
+
+
+/*
  * The following function is used to get the replica controller pod name.
  */
 
