@@ -690,7 +690,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	 */
 
 	r.Log.Info("Creating a new pod", 
-						r.createLogParams(h, "ReplicaSet.Name", rep.Name)...)
+						r.createLogParams(h, "Deployment.Name", rep.Name)...)
 
 	r.Log.V(1).Info("Replica details", 
 				r.createLogParams(h, "Details", rep)...)
@@ -699,7 +699,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 
 	if err != nil {
  		r.Log.Error(err, "Failed to create the new pod",
-						r.createLogParams(h, "ReplicaSet.Name", rep.Name)...)
+						r.createLogParams(h, "Deployment.Name", rep.Name)...)
 
 		return "", err
 	}
