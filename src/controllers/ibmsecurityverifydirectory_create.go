@@ -476,7 +476,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicationAgreement(
 	command       := []string{"isvd_manage_replica"}
 	portStr       := strconv.Itoa(int(h.config.port))
 
-	principalPod := r.getReplicaSetPodName(h, principalRep)
+	//principalPod := r.getReplicaSetPodName(h, principalRep)
 	srcPod       := r.getReplicaSetPodName(h, srcRep)
 	//dstPod       := r.getReplicaSetPodName(h, dstRep)
 
