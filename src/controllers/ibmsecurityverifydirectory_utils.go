@@ -24,7 +24,6 @@ import (
 	"strings"
 	"time"
 	"context"
-	"log"
 
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -60,49 +59,60 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaPodName(
 /*
  * The following function is used to get the replica controller pod name.
  */
-
 func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
-			h		*RequestHandle,
-			replicaName	string) (string) {
+        h *RequestHandle,
+        replicaName string) string {
 
-	r.Log.V(1).Info("Entering a function", 
-			r.createLogParams(h, "Function", "getReplicaSetPodName",
-				"Replica.Name", replicaName)...)
-	
-	// Create a Kubernetes client
-        config, err := kubernetes.NewInClusterConfig()
+        r.Log.V(1).Info("Entering a function",
+                r.createLogParams(h, "Function", "getReplicaSetPodName",
+                        "Replica.Name", replicaName)...)
+
+        // Get cluster config
+        clusterconfig := ctrl.GetConfigOrDie()
+
+        // Create a Kubernetes client
+        clientset := kubernetes.NewForConfigOrDie(clusterconfig)
+
+        // Get the replicaset
+        replicaset, err := clientset.AppsV1().ReplicaSets(h.directory.Namespace).Get(context.Background(), replicaName, metav1.GetOptions{})
         if err != nil {
-   	    r.Log.Error(err, "Failed to create Kubernetes client",
-						r.createLogParams(h, "Replica.Name", replicaName)...)
+                r.Log.Error(err, "Failed to get the replicaset",
+                        r.createLogParams(h, "Replica.Name", replicaName)...)
         }
-        clientset, err := kubernetes.NewForConfig(config)
+
+        // Get the replicaset's labels
+        selector, err := metav1.LabelSelectorAsSelector(replicaset.Spec.Selector)
         if err != nil {
-   	    r.Log.Error(err, "Failed to get the clientset",
-						r.createLogParams(h, "Replica.Name", replicaName)...)
+                r.Log.Error(err, "Failed to get the replicaset labels",
+                        r.createLogParams(h, "Replica.Name", replicaName)...)
         }
 
-    	// Get the replicaset
-    	replicaset, err := clientset.AppsV1().ReplicaSets().Get(context.TODO(), replicaName, v1.GetOptions{})
-    	if err != nil {
-   	    r.Log.Error(err, "Failed to get the replicaset",
-						r.createLogParams(h, "Replica.Name", replicaName)...)
-    	}
-
-        // Wait for the replica set to be available.
-        /*err = wait.PollImmediate(time.Second, 3*time.Minute, func() (bool, error) {
-        // Check if the replica set is available.
-        if replicaSet.Status.ReadyReplicas == replicaSet.Status.Replicas {
-            return true, nil
+        // Use the app's label selector name. Remember this should match with
+        // the controller selector's matchLabels.
+        options := metav1.ListOptions{
+                LabelSelector: fmt.Sprintf("%s", selector),
         }
 
-        // The replica set is not available yet.
-        return false, nil
-    	})
-	if err != nil {
-            panic(err)
-    	}*/
-	
-	return replicaset.Spec.Template.Spec.Containers[0].Name
+        // Get the pods list controlled by the replicaset
+
+        r.Log.Info("Getting the pod",
+                r.createLogParams(h, "Deployment.Label", selector)...)
+
+        r.Log.V(1).Info("Replica details",
+                r.createLogParams(h, "Details", replicaName)...)
+
+        podList, _ := clientset.CoreV1().Pods(h.directory.Namespace).List(context.Background(), options)
+
+        // Get the name of the first pod
+        podname := (*podList).Items[0]
+
+        r.Log.Info("Returning the pod name",
+                r.createLogParams(h, "Pod.Name", podname.Name)...)
+
+        r.Log.V(1).Info("Replica details",
+                r.createLogParams(h, "Details", replicaName)...)
+
+        return fmt.Sprintf("%s", podname.Name)
 }
 
 /*****************************************************************************/
