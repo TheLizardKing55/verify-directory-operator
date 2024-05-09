@@ -634,8 +634,10 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	 */
 
 	labels := map[string]string{
-		"app.kubernetes.io/kind":    "IBMSecurityVerifyDirectory",
-		"app.kubernetes.io/cr-name": podName,
+		"app.kubernetes.io/cr-name":  podName,
+		"app.kubernetes.io/pvc-name": pvcName,
+		"app.kubernetes.io/kind":     "IBMSecurityVerifyDirectory",
+		
 	}
 
 	/*
