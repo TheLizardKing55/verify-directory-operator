@@ -478,7 +478,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicationAgreement(
 
 	principalPod := r.getReplicaSetPodName(h, principalRep)
 	srcPod       := r.getReplicaSetPodName(h, srcRep)
-	dstPod       := r.getReplicaSetPodName(h, dstRep)
+	//dstPod       := r.getReplicaSetPodName(h, dstRep)
 
 	/*
 	 * Let's play it safe and delete any pre-existing replication agreements
@@ -486,25 +486,25 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicationAgreement(
 	 */
 
 	r.executeCommand(
-			h, srcPod, []string{"isvd_manage_replica", "-r", "-i", dstPod})
+			h, srcPod, []string{"isvd_manage_replica", "-r", "-i", dstRep})
 
 	/*
 	 * Now we can add in the replication agreement.
 	 */
 
-	if principalPod == srcPod {
+	if principalRep == srcRep {
 		command = append(command, "-ap",
-            "-h",  dstPod,
+            		"-h",  dstRep,
 			"-p",  portStr,
-			"-i",  dstPod,
-            "-ph", srcPod,
+			"-i",  dstRep,
+            		"-ph", srcRep,
 			"-pp", portStr)
 	} else {
 		command = append(command, "-ar",
-			"-h", dstPod,
+			"-h", dstRep,
 			"-p", portStr,
-			"-i", dstPod,
-			"-s", principalPod)
+			"-i", dstRep,
+			"-s", principalRep)
 	}
 
 	if h.config.secure {
@@ -690,7 +690,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	 */
 
 	r.Log.Info("Creating a new pod", 
-						r.createLogParams(h, "Deployment.Name", rep.Name)...)
+						r.createLogParams(h, "ReplicaSet.Name", rep.Name)...)
 
 	r.Log.V(1).Info("Replica details", 
 				r.createLogParams(h, "Details", rep)...)
@@ -699,9 +699,9 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 
 	if err != nil {
  		r.Log.Error(err, "Failed to create the new pod",
-						r.createLogParams(h, "Deployment.Name", rep.Name)...)
+						r.createLogParams(h, "ReplicaSet.Name", rep.Name)...)
 
-		return "", err
+		//return "", err
 	}
 
         // Get the pod name
