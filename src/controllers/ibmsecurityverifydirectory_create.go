@@ -88,7 +88,13 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 			return nil, err
 		}
 
+		r.Log.V(1).Info("Entering a function", 
+			r.createLogParams(h, "Function", "getReplicaDeploymentName", "pod", pod)...)
+		
 		deployment := r.getReplicaDeploymentName(pod)
+
+		r.Log.Info("Getting deployment name", 
+						r.createLogParams(h, "Deployment.Name", deployment)...)
 
 		err = r.createClusterService(h, deployment, h.config.port, principal)
 
