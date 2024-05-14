@@ -118,6 +118,25 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
 /*****************************************************************************/
 
 /*
+ * The following function is used to generate the deployment name for the pod.
+ */
+
+func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaPodName(
+			podName    string) (string) {
+	// Find the index of the last dash.
+        lastDashIndex := strings.LastIndex(podName, "-")
+
+        var str string
+
+       // Slice the string from the beginning to the last dash index.
+	str = podName[:lastDashIndex]
+
+	return str
+}
+
+/*****************************************************************************/
+
+/*
  * The following function is used to generate the ConfigMap name for the 
  * directory deployment.
  */
