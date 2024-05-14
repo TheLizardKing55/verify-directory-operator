@@ -657,12 +657,12 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 		Spec: appsv1.ReplicaSetSpec{
 			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
-				MatchLabels: utils.LabelsForPod(podName, pvcName),
+				MatchLabels: utils.LabelsForPod(h.directory.Name, podName, pvcName),
 			},
 	                Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      podName,
-					Labels:    utils.LabelsForPod(podName, pvcName),
+					Labels:    utils.LabelsForPod(h.directory.Name, podName, pvcName),
 				},
 				Spec: corev1.PodSpec{
 					Volumes:            volumes,
