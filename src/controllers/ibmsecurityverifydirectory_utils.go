@@ -442,7 +442,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 		},
 		Spec: corev1.ServiceSpec{
 			Type:     corev1.ServiceTypeClusterIP,
-			Selector: utils.LabelsForPod(podName, pvcName),
+			Selector: utils.LabelsForPod(h.directory.Name, podName, pvcName),
 			Ports:    []corev1.ServicePort{{
 				Name:       podName,
 				Protocol:   corev1.ProtocolTCP,
