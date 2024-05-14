@@ -102,7 +102,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 			return nil, err
 		}
 
-		existing[principal] = pod
+		existing[principal] = deployment
 
 		/*
 		 * If there are no additional replicas to be added we can simply
