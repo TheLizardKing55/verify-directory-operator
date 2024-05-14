@@ -354,7 +354,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getExistingPods(
 
 	opts := []client.ListOption{
 		client.InNamespace(h.req.Namespace),
-		client.MatchingLabels(utils.LabelsForApp(h.req.Name, "")),
+		client.MatchingLabels(utils.LabelsForReplica(h.req.Name, "")),
 	}
 
 	err := r.List(h.ctx, podList, opts...)
@@ -364,7 +364,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getExistingPods(
 						r.createLogParams(h)...)
 	} else {
 		for _, pod := range podList.Items {
-			pods[pod.ObjectMeta.Labels[utils.PVCLabel]] = pod.GetName()
+			pods[pod.ObjectMeta.Labels[utils.PVCLabel]] = pod.Spec.Containers[0].Name
 		}
 	}
 
