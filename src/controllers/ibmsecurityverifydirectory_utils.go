@@ -121,7 +121,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
  * The following function is used to generate the deployment name for the pod.
  */
 
-func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaPodName(
+func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaDeploymentName(
 			podname    string) (string) {
 	// Find the index of the last dash.
         lastDashIndex := strings.LastIndex(podname, "-")
