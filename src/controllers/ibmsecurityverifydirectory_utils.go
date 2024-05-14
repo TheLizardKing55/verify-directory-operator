@@ -430,17 +430,6 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 						"Pod.Name", podName, "Port", serverPort,
 						"PVC.Name", pvcName)...)
 
-	podName  := r.getReplicaPodName(h.directory, pvcName)
-
-	/*
-	 * Set the labels for the pod.
-	 */
-
-	labels := map[string]string{
-		"app.kubernetes.io/kind":    "IBMSecurityVerifyDirectory",
-		"app.kubernetes.io/cr-name": podName,
-	}
-
 	/*
 	 * Initialise the service structure.
 	 */
@@ -449,11 +438,11 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
 			Namespace: h.directory.Namespace,
-			Labels:    labels,
+			Labels:    utils.LabelsForApp(h.directory.Name, pvcName),
 		},
 		Spec: corev1.ServiceSpec{
 			Type:     corev1.ServiceTypeClusterIP,
-			Selector: labels,
+			Selector: utils.LabelsForPod(podName, pvcName),
 			Ports:    []corev1.ServicePort{{
 				Name:       podName,
 				Protocol:   corev1.ProtocolTCP,
