@@ -122,14 +122,14 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
  */
 
 func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaPodName(
-			podName    string) (string) {
+			podname    string) (string) {
 	// Find the index of the last dash.
-        lastDashIndex := strings.LastIndex(podName, "-")
+        lastDashIndex := strings.LastIndex(podname, "-")
 
         var str string
 
        // Slice the string from the beginning to the last dash index.
-	str = podName[:lastDashIndex]
+	str = podname[:lastDashIndex]
 
 	return str
 }
