@@ -72,10 +72,11 @@ func LabelsForApp(name string, pvc string) map[string]string {
  * Construct and return a list of labels for the deployment.
  */
 
-func LabelsForPod(name string, pvc string) map[string]string {
+func LabelsForPod(name string, pod string, pvc string) map[string]string {
 	labels := map[string]string{
 			"app.kubernetes.io/kind":     "IBMSecurityVerifyDirectory",
-			"app.kubernetes.io/cr-name":  name}
+			"app.kubernetes.io/app":      name,   
+			"app.kubernetes.io/cr-name":  pod}
 
 	if pvc != "" {
 		labels[PVCLabel] = pvc
@@ -85,6 +86,4 @@ func LabelsForPod(name string, pvc string) map[string]string {
 }
 
 /*****************************************************************************/
-
-
 
