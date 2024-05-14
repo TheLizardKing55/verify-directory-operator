@@ -88,11 +88,9 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 			return nil, err
 		}
 
-		var deployment string
+		deployment := r.getReplicaDeploymentName(pod)
 
-		
-
-		err = r.createClusterService(h, pod, h.config.port, principal)
+		err = r.createClusterService(h, deployment, h.config.port, principal)
 
 		if err != nil {
 			return nil, err
