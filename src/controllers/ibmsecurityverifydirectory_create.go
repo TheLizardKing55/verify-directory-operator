@@ -88,6 +88,10 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 			return nil, err
 		}
 
+		var deployment string
+
+		
+
 		err = r.createClusterService(h, pod, h.config.port, principal)
 
 		if err != nil {
@@ -633,12 +637,12 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	 * Set the labels for the pod.
 	 */
 
-	labels := map[string]string{
+	/*labels := map[string]string{
 		"app.kubernetes.io/cr-name":  podName,
 		"app.kubernetes.io/pvc-name": pvcName,
-		"app.kubernetes.io/kind":     "IBMSecurityVerifyDirectory",
+	 	"app.kubernetes.io/kind":     "IBMSecurityVerifyDirectory",
 		
-	}
+	}*/
 
 	/*
 	 * Finalise the deployment definition.
@@ -655,12 +659,12 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 		Spec: appsv1.ReplicaSetSpec{
 			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
-				MatchLabels: labels,
+				MatchLabels: utils.LabelsForPod(podName, pvcName),
 			},
 	                Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      podName,
-					Labels:    labels,
+					Labels:    utils.LabelsForPod(podName, pvcName),
 				},
 				Spec: corev1.PodSpec{
 					Volumes:            volumes,
