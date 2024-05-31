@@ -80,6 +80,38 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
                         r.createLogParams(h, "Replica.Name", replicaName)...)
         }
 
+       r.Log.Info("Waiting up to 2 minutes for the pod to show up",
+                r.createLogParams(h, "Replica.Name", replicaName)...)
+
+        r.Log.V(1).Info("Replica details",
+                r.createLogParams(h, "Details", replicaName)...)
+	
+	retryCount := 60             // Adjust retry count as needed
+        backoff := time.Second * 2   // Initial backoff time
+        for i := 0; i < retryCount; i++ {
+
+          fmt.Println(replicaset.Status.FullyLabeledReplicas)
+
+          if replicaset.Status.FullyLabeledReplicas >= 1 {
+             r.Log.Info("Pod is available for...",
+                      r.createLogParams(h, "Replica.Name", replicaName)...)
+
+             r.Log.V(1).Info("Replica details",
+                      r.createLogParams(h, "Details", replicaName)...)
+             break
+          }
+
+          time.Sleep(backoff)
+
+          // Get the replicaset
+          replicaset, err := clientset.AppsV1().ReplicaSets(h.directory.Namespace).Get(context.Background(), replicaName, metav1.GetOptions{})
+          if err != nil {
+                r.Log.Error(err, "Failed to get the replicaset",
+                        r.createLogParams(h, "Replica.Name", replicaName)...)
+          }
+
+        }
+
         // Get the replicaset's labels
         selector, err := metav1.LabelSelectorAsSelector(replicaset.Spec.Selector)
         if err != nil {
