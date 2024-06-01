@@ -459,7 +459,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 
 	r.Log.V(1).Info("Entering a function", 
 				r.createLogParams(h, "Function", "createClusterService",
-						"Pod.Name", podName, "Port", serverPort,
+						"Replica.Name", podName, "Port", serverPort,
 						"PVC.Name", pvcName)...)
 
 	/*
@@ -493,8 +493,8 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 	 * Create the service.
 	 */
 
-	r.Log.Info("Creating a new service for the pod", 
-				r.createLogParams(h, "Pod.Name", podName)...)
+	r.Log.Info("Creating a new service for the replica", 
+				r.createLogParams(h, "Replica.Name", podName)...)
 
 	r.Log.V(1).Info("Service details", 
 			r.createLogParams(h, "Service", service)...)
@@ -502,8 +502,8 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 	err := r.Create(h.ctx, service)
 
 	if err != nil {
- 		r.Log.Error(err, "Failed to create the service for the pod",
-				r.createLogParams(h, "Pod.Name", podName)...)
+ 		r.Log.Error(err, "Failed to create the service for the replica",
+				r.createLogParams(h, "Replica.Name", podName)...)
 
 		return err
 	}
