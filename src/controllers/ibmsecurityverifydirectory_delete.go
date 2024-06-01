@@ -124,7 +124,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteReplica(
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
 			Namespace: h.directory.Namespace,
-			Labels:    labels,
+			Labels:    utils.LabelsForApp(h.directory.Name, pvcName),
 		},
 	}
 
