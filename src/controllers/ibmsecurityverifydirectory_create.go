@@ -208,11 +208,20 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 			return nil, err
 		}
 
-		replicaPods[pvcName] = podName
-		existing[pvcName]    = podName
+		r.Log.V(1).Info("Entering a function", 
+			r.createLogParams(h, "Function", "getReplicaDeploymentName", "pod", podName)...)
+		
+		deploymentName := r.getReplicaDeploymentName(podName)
+
+		r.Log.Info("Getting deployment name", 
+						r.createLogParams(h, "Deployment.Name", deploymentName)...)
+		
+		replicaPods[pvcName] = deploymentName
+		existing[pvcName]    = deploymentName
 	}
 
-	for _, podName := range replicaPods {
+	for _, replicaName := range replicaPods {
+		podName = r.getReplicaSetPodName(h, replicaName)
 		err = r.waitForPod(h, podName)
 
 		if err != nil {
@@ -255,7 +264,15 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 		return nil, err
 	}
 
-	err = r.createClusterService(h, principalPod, h.config.port, principal)
+	r.Log.V(1).Info("Entering a function", 
+		r.createLogParams(h, "Function", "getReplicaDeploymentName", "pod", principalPod)...)
+		
+	principalDeployment := r.getReplicaDeploymentName(principalPod)
+
+	r.Log.Info("Getting deployment name", 
+					r.createLogParams(h, "Deployment.Name", principalDeployment)...)
+	
+	err = r.createClusterService(h, principalDeployment, h.config.port, principal)
 
 	if err != nil {
 		return  nil, err
