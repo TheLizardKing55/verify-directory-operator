@@ -221,7 +221,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 	}
 
 	for _, replicaName := range replicaPods {
-		podName = r.getReplicaSetPodName(h, replicaName)
+		podName := r.getReplicaSetPodName(h, replicaName)
 		err = r.waitForPod(h, podName)
 
 		if err != nil {
