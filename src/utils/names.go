@@ -28,22 +28,22 @@ var   ProxyCMKey      = "config.yaml"
 /*****************************************************************************/
 
 /*
- * The following function is used to generate the deployment name for the 
+ * The following function is used to generate the deployment name for the
  * proxy deployment.
  */
 
-func GetProxyDeploymentName(name string) (string) {
+func GetProxyDeploymentName(name string) string {
 	return strings.ToLower(fmt.Sprintf("%s-proxy", name))
 }
 
 /*****************************************************************************/
 
 /*
- * The following function is used to generate the ConfigMap name for the 
+ * The following function is used to generate the ConfigMap name for the
  * proxy deployment.
  */
 
-func GetProxyConfigMapName(name string) (string) {
+func GetProxyConfigMapName(name string) string {
 	return strings.ToLower(fmt.Sprintf("%s-proxy", name))
 }
 
