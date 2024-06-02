@@ -14,9 +14,9 @@ package controllers
 /*****************************************************************************/
 
 import (
-	appsv1 "k8s.io/api/apps/v1"
-	corev1  "k8s.io/api/core/v1"
+	appsv1  "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
+	corev1  "k8s.io/api/core/v1"
 	metav1  "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"fmt"
@@ -194,7 +194,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 
 	/*
 	 * Now that the PVCs have been seeded with initial data we can now
-	 * create and start each of the new replicas.  
+	 * create and start each of the new replicas.
 	 */
 
 	replicaPods := make(map[string]string)
@@ -246,11 +246,11 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 	 * Now we can create the cluster service for each of the new replicas.
 	 */
 
-	for pvcName, podName:= range replicaPods {
+	for pvcName, podName := range replicaPods {
 		err = r.createClusterService(h, podName, h.config.port, pvcName)
 
 		if err != nil {
-			return  nil, err
+			return nil, err
 		}
 	}
 
@@ -275,7 +275,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 	err = r.createClusterService(h, principalDeployment, h.config.port, principal)
 
 	if err != nil {
-		return  nil, err
+		return nil, err
 	}
 
 	err = r.waitForPod(h, principalPod)
@@ -318,7 +318,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) seedReplica(
 	 * The volume configuration.
 	 */
 
-	volumes := []corev1.Volume {
+	volumes := []corev1.Volume{
 		{
 			Name: "isvd-server-config",
 			VolumeSource: corev1.VolumeSource{
@@ -353,7 +353,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) seedReplica(
 		},
 	}
 
-	volumeMounts := []corev1.VolumeMount {
+	volumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "isvd-server-config",
 			MountPath: "/var/isvd/config",
@@ -373,15 +373,15 @@ func (r *IBMSecurityVerifyDirectoryReconciler) seedReplica(
 	 */
 
 	env := append(h.directory.Spec.Pods.Env, 
-		corev1.EnvVar {
+		corev1.EnvVar{
 		   	Name: "general.license.accept",
 			Value: "limited",
 		},
-		corev1.EnvVar {
+		corev1.EnvVar{
 		   	Name: "general.license.key",
 			Value: h.config.licenseKey,
 		},
-		corev1.EnvVar {
+		corev1.EnvVar{
 		   	Name: "YAML_CONFIG_FILE",
 			Value: fmt.Sprintf("/var/isvd/config/%s", ConfigMapKey),
 		},
@@ -405,8 +405,8 @@ func (r *IBMSecurityVerifyDirectoryReconciler) seedReplica(
 			Completions:             &completions,
 			TTLSecondsAfterFinished: &ttl,
 			BackoffLimit:            &backOffLimit,
-			Template:                corev1.PodTemplateSpec {
-				Spec: corev1.PodSpec {
+			Template:                corev1.PodTemplateSpec{
+				Spec: corev1.PodSpec{
 					Volumes:            volumes,
 					ImagePullSecrets:   h.directory.Spec.Pods.Image.ImagePullSecrets,
 					ServiceAccountName: h.directory.Spec.Pods.ServiceAccountName,
@@ -438,10 +438,10 @@ func (r *IBMSecurityVerifyDirectoryReconciler) seedReplica(
  		r.Log.Error(err, "Failed to create the new job",
 						r.createLogParams(h, "Job.Name", job.Name)...)
 
-		return 
+		return
 	}
 
-	return 
+	return
 }
 
 /*****************************************************************************/
@@ -489,7 +489,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicationAgreement(
 			h            *RequestHandle, 
 			principalPvc string,
 			sourcePvc    string,
-			destPvc      string) (error) {
+			destPvc      string) error {
 
 	r.Log.Info(
 		"Creating the replication agreement for the new replica", 
@@ -562,7 +562,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	 * The port which is exported by the deployment.
 	 */
 
-	ports := []corev1.ContainerPort {{
+	ports := []corev1.ContainerPort{{
 		Name:          "ldap",
 		ContainerPort: h.config.port,
 		Protocol:      corev1.ProtocolTCP,
@@ -572,7 +572,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	 * The volume configuration.
 	 */
 
-	volumes := []corev1.Volume {
+	volumes := []corev1.Volume{
 		{
 			Name: "isvd-server-config",
 			VolumeSource: corev1.VolumeSource{
@@ -598,7 +598,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 		},
 	}
 
-	volumeMounts := []corev1.VolumeMount {
+	volumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "isvd-server-config",
 			MountPath: "/var/isvd/config",
@@ -614,12 +614,12 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	 */
 
 	env := append(h.directory.Spec.Pods.Env, 
-		corev1.EnvVar {
+		corev1.EnvVar{
 		   	Name: "YAML_CONFIG_FILE",
 			Value: fmt.Sprintf("/var/isvd/config/%s", 
 						h.directory.Spec.Pods.ConfigMap.Server.Key),
 		},
-		corev1.EnvVar {
+		corev1.EnvVar{
 		   	Name: "general.id",
 			Value: podName,
 		},
@@ -629,11 +629,11 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 	 * The liveness, and readiness probe definitions.
 	 */
 
-	livenessProbe := &corev1.Probe {
+	livenessProbe := &corev1.Probe{
 		InitialDelaySeconds: 2,
 		PeriodSeconds:       10,
-		ProbeHandler:        corev1.ProbeHandler {
-			Exec: &corev1.ExecAction {
+		ProbeHandler:        corev1.ProbeHandler{
+			Exec: &corev1.ExecAction{
 				Command: []string{
 					"/sbin/health_check.sh",
 					"livenessProbe",
@@ -642,11 +642,11 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deployReplica(
 		},
 	}
 
-	readinessProbe := &corev1.Probe {
+	readinessProbe := &corev1.Probe{
 		InitialDelaySeconds: 4,
 		PeriodSeconds:       5,
-		ProbeHandler:        corev1.ProbeHandler {
-	 		Exec: &corev1.ExecAction {
+		ProbeHandler:        corev1.ProbeHandler{
+	 		Exec: &corev1.ExecAction{
 				Command: []string{
 					"/sbin/health_check.sh",
 				},
