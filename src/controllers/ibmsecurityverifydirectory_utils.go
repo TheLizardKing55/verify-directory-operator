@@ -132,7 +132,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
         // Get the pods list controlled by the replicaset
 
         r.Log.Info("Getting the pod",
-                r.createLogParams(h, "Deployment.Label", selector)...)
+                r.createLogParams(h, "Pod.Label", selector)...)
 
         r.Log.V(1).Info("Replica details",
                 r.createLogParams(h, "Details", replicaName)...)
