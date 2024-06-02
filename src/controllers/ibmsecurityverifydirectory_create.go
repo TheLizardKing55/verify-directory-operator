@@ -93,8 +93,8 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 		
 		deployment := r.getReplicaDeploymentName(pod)
 
-		r.Log.Info("Getting deployment name", 
-						r.createLogParams(h, "Deployment.Name", deployment)...)
+		r.Log.Info("Getting the replica name", 
+						r.createLogParams(h, "Replica.Name", deployment)...)
 
 		err = r.createClusterService(h, deployment, h.config.port, principal)
 
@@ -213,8 +213,8 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 		
 		deploymentName := r.getReplicaDeploymentName(podName)
 
-		r.Log.Info("Getting deployment name", 
-						r.createLogParams(h, "Deployment.Name", deploymentName)...)
+		r.Log.Info("Getting the replica name", 
+						r.createLogParams(h, "Replica.Name", deploymentName)...)
 		
 		replicaPods[pvcName] = deploymentName
 		existing[pvcName]    = deploymentName
@@ -269,8 +269,8 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createReplicas(
 		
 	principalDeployment := r.getReplicaDeploymentName(principalPod)
 
-	r.Log.Info("Getting deployment name", 
-					r.createLogParams(h, "Deployment.Name", principalDeployment)...)
+	r.Log.Info("Getting the replica name", 
+					r.createLogParams(h, "Replica.Name", principalDeployment)...)
 	
 	err = r.createClusterService(h, principalDeployment, h.config.port, principal)
 
