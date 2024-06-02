@@ -7,7 +7,7 @@
 package controllers
 
 /*
- * This file contains the some utility style functions which are used by the 
+ * This file contains the some utility style functions which are used by the
  * controller.
  */
 
@@ -19,11 +19,11 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
-	"context"
 
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -94,7 +94,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
                   r.createLogParams(h, "Available pods", replicaset.Status.FullyLabeledReplicas)...)
 
           r.Log.V(1).Info("Replica details",
-                  r.createLogParams(h, "Details", replicaName)...)          
+                  r.createLogParams(h, "Details", replicaName)...)
 
           if replicaset.Status.FullyLabeledReplicas >= 1 {
              r.Log.Info("Pod is available for...",
@@ -158,7 +158,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaSetPodName(
  */
 
 func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaDeploymentName(
-			podname    string) (string) {
+			podname    string) string {
 	// Find the index of the last dash.
         lastDashIndex := strings.LastIndex(podname, "-")
 
@@ -173,12 +173,12 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getReplicaDeploymentName(
 /*****************************************************************************/
 
 /*
- * The following function is used to generate the ConfigMap name for the 
+ * The following function is used to generate the ConfigMap name for the
  * directory deployment.
  */
 
 func (r *IBMSecurityVerifyDirectoryReconciler) getSeedConfigMapName(
-			directory  *ibmv1.IBMSecurityVerifyDirectory) (string) {
+			directory  *ibmv1.IBMSecurityVerifyDirectory) string {
 	return strings.ToLower(fmt.Sprintf("%s-seed", directory.Name))
 }
 
@@ -191,7 +191,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) getSeedConfigMapName(
 
 func (r *IBMSecurityVerifyDirectoryReconciler) getSeedJobName(
 			directory    *ibmv1.IBMSecurityVerifyDirectory,
-			pvc          string) (string) {
+			pvc          string) string {
 	return fmt.Sprintf("%s-seed", r.getReplicaPodName(directory, pvc))
 }
 
@@ -211,7 +211,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createConfigMap(
 	r.Log.V(1).Info("Entering a function", 
 				r.createLogParams(h, "Function", "createConfigMap",
 						"Map.Name", mapName, "Key", key,
-						"Value", value)...)	
+						"Value", value)...)
 
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
@@ -267,7 +267,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteConfigMap(
 
 	r.Log.V(1).Info("Entering a function", 
 				r.createLogParams(h, "Function", "deleteConfigMap",
-						"Map.Name", mapName)...)	
+						"Map.Name", mapName)...)
 
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
@@ -280,7 +280,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) deleteConfigMap(
 	err = r.Delete(h.ctx, configMap)
 
 	if err != nil {
-		return 
+		return
 	}
 
 	return
@@ -303,7 +303,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) isJobComplete(
 		err	:= r.Get(h.ctx, 
 					types.NamespacedName{
 						Name:	   podName,
-						Namespace: h.directory.Namespace }, job)
+						Namespace: h.directory.Namespace}, job)
 
 		r.Log.V(1).Info("Checking if a job has completed", 
 				r.createLogParams(h, "Job", job)...)
@@ -341,7 +341,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) isPodOpComplete(
 		err	:= r.Get(h.ctx, 
 					types.NamespacedName{
 						Name:	   podName,
-						Namespace: h.directory.Namespace }, pod)
+						Namespace: h.directory.Namespace}, pod)
 
 		r.Log.V(1).Info("Checking if a Pod operation has completed", 
 			r.createLogParams(h, "Wait.For.Start", waitForStart, "Pod", pod)...)
@@ -412,7 +412,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) waitForPod(
 		err = errors.New(fmt.Sprintf("The pod, %s, failed to become ready " +
 				"within the allocated time.", name))
 
-		return 
+		return
 	}
 
 	return
@@ -443,7 +443,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) waitForJob(
 				"The job failed to complete within the allocated time.",
 				r.createLogParams(h, "Job.Name", name)...)
 
-		return 
+		return
 	}
 
 	return
@@ -459,7 +459,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 			h          *RequestHandle,
 			podName    string,
 			serverPort int32,
-			pvcName    string) (error) {
+			pvcName    string) error {
 
 	r.Log.V(1).Info("Entering a function", 
 				r.createLogParams(h, "Function", "createClusterService",
@@ -483,7 +483,7 @@ func (r *IBMSecurityVerifyDirectoryReconciler) createClusterService(
 				Name:       podName,
 				Protocol:   corev1.ProtocolTCP,
 				Port:       serverPort,
-				TargetPort: intstr.IntOrString {
+				TargetPort: intstr.IntOrString{
 					Type:   intstr.Int,
 					IntVal: serverPort,
 				},
