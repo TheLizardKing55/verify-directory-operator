@@ -22,8 +22,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	ibmv1 "github.com/ibm-security/verify-directory-operator/api/v1"
-	"github.com/ibm-security/verify-directory-operator/utils"
 	"github.com/ibm-security/verify-directory-operator/controllers"
+	"github.com/ibm-security/verify-directory-operator/utils"
 	//+kubebuilder:scaffold:imports
 )
 
